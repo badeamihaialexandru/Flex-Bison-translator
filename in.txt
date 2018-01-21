@@ -1,0 +1,28 @@
+program My_prog
+begin
+int m =5;  
+int p; 
+float n = -0;
+m=4+2;
+M=4+2,3;
+if(true) then
+begin
+print m;
+end
+else
+begin
+repeat
+begin
+if(m>n) then
+begin
+int p;
+end
+else
+begin
+n = n-m;
+end
+end
+until (m != n);
+print m;
+end
+end

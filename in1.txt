@@ -1,0 +1,16 @@
+program Cali 
+begin
+int a;
+int b;
+boolean ok=false;
+repeat 
+begin 
+a=a+1;
+if (a==5) then 
+begin
+ok = true; 
+end 
+end 
+until (a==2);
+print a;
+end 

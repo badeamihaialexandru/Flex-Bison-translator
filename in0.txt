@@ -1,0 +1,31 @@
+program my_prog
+begin
+int d=900;
+int c;
+int c;
+c=3;
+if(true) then 
+begin 
+int cali=90000000000;
+end
+float f=-2,45;
+repeat 
+begin 
+c=2+1;
+end 
+until(c<5);
+float g=1,3;
+float mihai=1;
+float zamfir=-1;
+float mosu=+2;
+d=d+f;
+float enoiu;
+enoiu=0,2;
+boolean ina=true;
+boolean ioanid;
+c=c+g;
+ioanid=false;
+int a=-4;
+int b=+2;
+c=+3;
+end

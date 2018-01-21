@@ -1,0 +1,42 @@
+program my_prog
+begin 
+int a=1;
+int b=2;
+	if(a==b) then 
+	begin
+				if(a==b) then 
+				       begin
+					 int c=3; 
+				       end 
+				else 
+					begin     
+						if (a<b) then
+								    begin 
+									    if (a>b) then
+										  begin 
+										  print a;
+										  end 
+									    else 
+										begin
+										if (a!=b) then 
+										    begin 
+										    print a;
+										    end 
+										else 
+										    begin
+										    print c; 
+										    end 
+										end
+								     end
+						 else 
+								     begin
+								     print c;
+								     end 
+					end 
+	end 	
+	else 
+	   begin
+	   print c;
+	   end 
+end
+

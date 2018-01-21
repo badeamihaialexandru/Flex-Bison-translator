@@ -1,0 +1,38 @@
+program test_ifs
+begin 
+if (a<b) then 
+	begin 
+	print a;
+	end 
+if (a>b) then
+	begin 
+	print b;
+	end 
+if (a==b) then 
+	begin 
+	print c;
+	end 
+if (a!=b) then 
+	begin 
+	print d;
+	end 
+if (true) then 
+	begin 
+	print e;
+	end 
+if (false) then 
+	begin 
+	print f;
+	end 
+if (2<a) then 
+	begin 
+	print g;
+	end 
+if (a<2) then 
+	begin 
+	print h;
+	end
+
+
+	
+end 

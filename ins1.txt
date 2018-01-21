@@ -1,0 +1,5 @@
+program my_prog
+begin 
+int f=2;
+int f=3;
+end
