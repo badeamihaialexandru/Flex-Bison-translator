@@ -6,7 +6,9 @@
 %}
 boolval (true)|(false) 
 %%
+\/\/[a-zA-Z0-9 ;=()]*\n {colNo=1;lineNo++;}
 "int"	{ yylloc.first_line = lineNo; yylloc.first_column=colNo;colNo+=3; return TOK_DECLARE_INT ;}
+\"		 {colNo++;return TOK_TO_PRINT;}
 "boolean"       {yylloc.first_line = lineNo; yylloc.first_column=colNo;colNo+=7;return TOK_DECLARE_BOOL ;} 
 "program" 	{colNo+=7;return TOK_PROG; }
 
@@ -18,7 +20,7 @@ boolval (true)|(false)
 "if" 		{ colNo+=2; return TOK_IF;}
 "repeat"	{ colNo+=6; return TOK_REP;}
 "until"		{ colNo+=5; return TOK_UNT;}   
-"print"		{ colNo+=5; return TOK_PRINT;}
+"print"		{ yylloc.first_line = lineNo; yylloc.first_column=colNo;colNo+=5; return TOK_PRINT;}
 "read"		{ colNo+=4; return TOK_READ;}
 "then"		{ colNo+=4; return TOK_THEN;}
 "else"  	{ colNo+=4; return TOK_ELSE;}

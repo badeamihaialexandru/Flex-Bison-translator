@@ -1,28 +1,36 @@
 program My_prog
 begin
-int m =5;  
-int p; 
-float n = -0;
-m=4+2;
-M=4+2,3;
-if(true) then
-begin
-print m;
-end
-else
-begin
-repeat
-begin
-if(m>n) then
-begin
-int p;
-end
-else
-begin
-n = n-m;
-end
-end
-until (m != n);
-print m;
-end
+	int m=2-2+3 ; 
+	int p;
+	p=2;
+	float n=2-3-4 ;
+	n=2;
+	boolean bl;
+	bl=true;
+	int b;
+	m=4-+2;
+	p=4+-2,3;
+	if(true) then
+		begin
+		int w;
+		end
+	else
+		begin  //daca modific aici va da eroare pt begin si end 
+		repeat
+			begin
+				if( 3<2) then
+					begin
+						int Quali;
+						//Quali=2000;
+						print "ceva";
+					end
+				else
+					begin
+						print Quali;
+						m = p-m;
+					end
+			end
+		until (n!=m);
+		int z;
+		end
 end

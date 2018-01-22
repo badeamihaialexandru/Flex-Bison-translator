@@ -1,11 +1,11 @@
 %{
 #include <stdio.h>
      #include <string.h>
-
+	
 	int yylex();
 	int yyerror(const char *msg);
 	int yywarning(const char *wmsg);
-	int EsteCorecta = 1;
+	int CorSin = 1;
 	char msg[500];
 	char wmsg[500];
 	//pot sa mai fac sa dea warrning cand fac while(ok) si ok-ul nu se modifica 
@@ -99,13 +99,13 @@ typedef struct punct { int x,y,z; } PUNCT;
 
 
 %token TOK_MULTIPLY TOK_DIVIDE TOK_DECLARE TOK_PRINT TOK_ERROR TOK_DECLARE_INT TOK_DECLARE_BOOL TOK_DECLARE_FLOAT TOK_BEGIN TOK_END TOK_PROG
-TOK_IF TOK_REP TOK_UNT TOK_DIF TOK_EQU TOK_READ TOK_THEN TOK_ELSE
+TOK_IF TOK_REP TOK_UNT TOK_DIF TOK_EQU TOK_READ TOK_THEN TOK_ELSE 
  
 %token <sir> TOK_VARIABLE TOK_PLUS TOK_MINUS
 %token <sir> TOK_VAR 
-%token <sir>TOK_NUMBER TOK_FL TOK_AF 
+%token <sir>TOK_NUMBER TOK_FL TOK_AF ')' '(' TOK_TO_PRINT
 %type <sir> SGN E C
-
+%expect 32
 
 %start S
 
@@ -115,13 +115,13 @@ TOK_IF TOK_REP TOK_UNT TOK_DIF TOK_EQU TOK_READ TOK_THEN TOK_ELSE
 %%
 S : TOK_PROG TOK_VAR V
     | 
-    error V    
+    error V    {CorSin=0;}
     ;
 V :TOK_BEGIN I  TOK_END 
     |
-    error I   //in cazul in care eroarea apare la begin
+    error I   {CorSin=0;}//in cazul in care eroarea apare la begin
     |
-    error V   //in cazul in care eroarea apare la end 
+    error V  {CorSin=0;} //in cazul in care eroarea apare la end 
 ; 
 
 
@@ -140,7 +140,6 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 				{
 				sprintf(msg,"%d:%d Eroare semantica: Variabila a fost declarata deja!",@1.first_line, @1.first_column);
 				yyerror(msg);
-				YYERROR;
 				} 
 		 else 
 			{
@@ -152,7 +151,7 @@ T :TOK_DECLARE_INT TOK_VAR ';'
    TOK_DECLARE_INT TOK_VAR '=' TOK_NUMBER ';' 
 		{ 
 			bool ok=true;
-			if (strlen($4)>=10)
+			if (strlen($4)==10)
 				{
 				if(strcmp("2147483647",$4)<0)
 					{
@@ -161,7 +160,15 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 					yywarning(wmsg);					
 					}
 				}
-			if(ok)
+			if (strlen($4)>10)
+				{
+					{
+					ok=false;			
+					sprintf(wmsg,"%d:%d Eroare semantica: Gama de reprezentare a fost depasita!Valoarea lui %s a fost inlocuita cu INT_MAX!",@1.first_line, @1.first_column,$2);
+					yywarning(wmsg);					
+					}
+				}
+			if(ok==false)
 				{
 				strcpy($4,"2147483647");
 				}
@@ -186,7 +193,32 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 				
 				}
 			
-		}
+		}		
+    |
+   TOK_DECLARE_INT TOK_VAR '=' E ';' 
+		{ 
+					
+				if (variabile!=NULL)
+					{
+					if (variabile->exists($2)!=NULL)   //nu merge momentan functia asta 
+						{
+						sprintf(msg,"%d:%d Eroare semantica: Variabila a fost declarata deja!",@1.first_line, @1.first_column);
+						yyerror(msg);
+						YYERROR;					
+						}
+					else 
+						{
+						variabile->add("NULL",$2,'0');
+						}
+					}
+				else 
+				{
+					variabile=new Vars();
+					variabile->add("NULL",$2,'0');
+				
+				}
+			
+		}		
     |
    TOK_DECLARE_INT TOK_VAR '=' SGN TOK_NUMBER ';' 
 		{
@@ -377,6 +409,31 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 			}
 		}
     |
+   TOK_DECLARE_FLOAT TOK_VAR '=' E ';'
+			{ 
+					
+				if (variabile!=NULL)
+					{
+					if (variabile->exists($2)!=NULL)   //nu merge momentan functia asta 
+						{
+						sprintf(msg,"%d:%d Eroare semantica: Variabila a fost declarata deja!",@1.first_line, @1.first_column);
+						yyerror(msg);
+						YYERROR;					
+						}
+					else 
+						{
+						variabile->add("NULL",$2,'2');
+						}
+					}
+				else 
+				{
+					variabile=new Vars();
+					variabile->add("NULL",$2,'2');
+				
+				}
+			
+		}	
+    |
    TOK_IF '(' D ')' TOK_THEN V
     |
    TOK_IF '(' D ')' TOK_THEN V TOK_ELSE V
@@ -387,14 +444,25 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 	{
 		Vars* var=variabile->exists($2);
 		if(var!=NULL)
-			printf("%s",var->get_val());
+			{
+			if(strcmp(var->get_val(),"NULL")==0)
+				{
+				sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi initializata",@1.first_line, @1.first_column);
+				yyerror(msg);
+				YYERROR; 
+				}
+			//else 
+				//printf("%s\n",var->get_val());
+			}
 		else 
 			{
-			sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
+			sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
 			yyerror(msg);
 			YYERROR; 
 			}				
 	}
+     |
+   TOK_PRINT TOK_TO_PRINT TOK_VAR TOK_TO_PRINT ';' {printf("%s",$3);}
     |
    TOK_READ TOK_VAR ';'  
     |
@@ -408,7 +476,7 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 			}	
 	else 
 			{
-			sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
+			sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
 			yyerror(msg);
 			YYERROR; 
 			}	
@@ -424,24 +492,25 @@ T :TOK_DECLARE_INT TOK_VAR ';'
 			}	
 	else 
 			{
-			sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
+			sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
 			yyerror(msg);
 			YYERROR; 
 			}	
 	}
     |
-    error I  { }
+    error ';'  {CorSin=0;}
     ;
 D: TOK_AF
     |
     C
+  
 ;
 
 C : C '<' C
 	{
 	if((strcmp($1,"n")==0)&&(strcmp($3,"n")==0))
 		{
-		sprintf(wmsg,"%d:%d Conditia pusa va cauza o bucla infinita!",@1.first_line, @1.first_column);
+		sprintf(wmsg,"%d:%d Conditia pusa va avea mereu acelasi rezultat!",@1.first_line, @1.first_column);
 		yywarning(wmsg);
 		}
 	}
@@ -450,7 +519,7 @@ C : C '<' C
 	{
 	if((strcmp($1,"n")==0)&&(strcmp($3,"n")==0))
 		{
-		sprintf(wmsg,"%d:%d Conditia pusa va cauza o bucla infinita!",@1.first_line, @1.first_column);
+		sprintf(wmsg,"%d:%d Conditia pusa va avea mereu acelasi rezultat",@1.first_line, @1.first_column);
 		yywarning(wmsg);
 		}
 	}
@@ -459,24 +528,20 @@ C : C '<' C
     |
     C TOK_EQU C
     |
-    H TOK_DIF H
-    |
-    H TOK_EQU H
-    |
     TOK_VAR
 	{
 		Vars* var=variabile->exists($1);
 		if(var==NULL)
 				{
-				sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata!",@1.first_line, @1.first_column);
+				sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi declarata!",@1.first_line, @1.first_column);
 				yyerror(msg);
 				YYERROR; 
 				}
 		else 
 			{
-			if(var->get_val()==NULL)
+			if(strcmp(var->get_val(),"NULL")==0)
 				{
-				sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi initializata!",@1.first_line, @1.first_column);
+				sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi initializata!",@1.first_line, @1.first_column);
 				yyerror(msg);
 				YYERROR; 
 				}
@@ -484,38 +549,8 @@ C : C '<' C
 	}
     |
     TOK_NUMBER
-	{
-	$$="n";
-	}
-;
-H: TOK_AF
-    |
-   TOK_VAR  
-	{
-	Vars* var=variabile->exists($1);
-		if(var==NULL)
-				{
-				sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata!",@1.first_line, @1.first_column);
-				yyerror(msg);
-				YYERROR; 
-				}
-		else 
-			{
-			if(var->get_type()=='1')
-				{
-				sprintf(msg,"%d:%d Eroare sintactica: Variabilele de tip bool nu pot fi comparate cu numere intregi sau reale!",@1.first_line, @1.first_column);
-				yyerror(msg);
-				YYERROR; 
-				}
-			if(var->get_val()==NULL)
-				{
-				sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi initializata!",@1.first_line, @1.first_column);
-				yyerror(msg);
-				YYERROR; 
-				}
-			
-			}
-	}
+	{$$="n";}
+
 ;
 E:  E TOK_PLUS E
 	{
@@ -535,6 +570,31 @@ E:  E TOK_PLUS E
     | 
     TOK_NUMBER 
 	{
+	{
+	bool ok=true;
+			if (strlen($1)==10)
+				{
+				if(strcmp("2147483647",$1)<0)
+					{
+					ok=false;			
+					sprintf(wmsg,"%d:%d Eroare semantica: Gama de reprezentare a fost depasita!Valoarea lui %s a fost inlocuita cu INT_MAX!",@1.first_line, @1.first_column);
+					yywarning(wmsg);					
+					}
+				}
+			if (strlen($1)>10)
+				{
+					{
+					ok=false;			
+					sprintf(wmsg,"%d:%d Eroare semantica: Gama de reprezentare a fost depasita! Valoarea a fost inlocuita cu INT_MAX!",@1.first_line, @1.first_column,$1);
+					yywarning(wmsg);					
+					}
+				}
+			if(ok==false)
+				{
+				strcpy($1,"2147483647");
+				}
+	
+	}
 	$$=$1;
 	}
     |
@@ -549,7 +609,7 @@ E:  E TOK_PLUS E
 		}
 		else 
 		{
-			sprintf(msg,"%d:%d Eroare sintactica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
+			sprintf(msg,"%d:%d Eroare semantica: Variabila utilizata fara a fi declarata",@1.first_line, @1.first_column);
 			yyerror(msg);
 			YYERROR; 
 		}
@@ -580,9 +640,9 @@ int main()
 {
 	
 	yyparse();
-	if(EsteCorecta == 1)
+	if(CorSin == 1)
 	{
-		//printf("CORECTA\n");		
+		printf("CORECTA\n");		
 	}	
        return 0;
 }
@@ -593,8 +653,10 @@ int yywarning(const char* wmsg)
 }
 int yyerror(const char *msg)
 {
+	CorSin=0;
 	printf("Error: %s\n", msg);
 	return 1;
+	
 }
 
 

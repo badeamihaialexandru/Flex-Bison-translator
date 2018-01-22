@@ -3,10 +3,12 @@ begin
 int d=900;
 int c;
 int c;
+int cali=922222222222; //face ceva
 c=3;
 if(true) then 
 begin 
-int cali=90000000000;
+int toamna;
+
 end
 float f=-2,45;
 repeat 

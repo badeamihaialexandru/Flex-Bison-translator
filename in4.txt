@@ -1,5 +1,13 @@
 program test_ifs
 begin 
+int a=2;
+int b=3;
+int c=2;
+int d=4;
+int e=3;
+int f=2;
+int h=2;
+int g=2;
 if (a<b) then 
 	begin 
 	print a;

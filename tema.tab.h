@@ -40,7 +40,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 94 "tema.y" /* yacc.c:1909  */
+#line 95 "tema.y" /* yacc.c:1909  */
 
 typedef struct punct { int x,y,z; } PUNCT;
 
@@ -76,7 +76,8 @@ typedef struct punct { int x,y,z; } PUNCT;
     TOK_VAR = 280,
     TOK_NUMBER = 281,
     TOK_FL = 282,
-    TOK_AF = 283
+    TOK_AF = 283,
+    TOK_TO_PRINT = 284
   };
 #endif
 
@@ -85,10 +86,10 @@ typedef struct punct { int x,y,z; } PUNCT;
 
 union YYSTYPE
 {
-#line 97 "tema.y" /* yacc.c:1909  */
+#line 98 "tema.y" /* yacc.c:1909  */
  char* sir; int val; PUNCT p; 
 
-#line 92 "tema.tab.h" /* yacc.c:1909  */
+#line 93 "tema.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
